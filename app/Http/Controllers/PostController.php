@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 
 class PostController extends Controller
 {
     public function index()
     {
 
-        return Post::latest()->with('user')->get();
+        return Post::latest()->with('user')->get()->load([
+            'likes:id,user_id,post_id',
+            'comments:id,description,user_id,post_id',
+            'comments.user:id,username,firstname,lastname,avatar'
+        ]);
     }
     public function store(Request $request)
     {
@@ -26,16 +27,20 @@ class PostController extends Controller
                     $path = $request->file('image')->store('posts', 'public');
                 }
             }
-            // $userId2 = $request->user();
             $post = Post::create([
                 'user_id' => $userId,
                 'description' => $request['description'] ?? "",
                 'image' => $path ?? null,
             ]);
+
             return response()->json([
                 'error' => false,
-                'data' => $post->with('user'),
-                // 'userId' => $userId2,
+                'data' => $post->load([
+                    'user:id,username,avatar',
+                    'likes:id,user_id,post_id',
+                    'comments:id,description,user_id,post_id',
+                    'comments.user:id,username,firstname,lastname,avatar'
+                ]),
                 'message' => 'Created!'
             ], 201);
         } catch (\Exception $err) {
@@ -43,11 +48,13 @@ class PostController extends Controller
         }
     }
 
-    public function update(int $id, Request $request){
+    public function update(int $id, Request $request)
+    {
 
     }
 
-    public function destroy(int $id){
+    public function destroy(int $id)
+    {
 
     }
 
