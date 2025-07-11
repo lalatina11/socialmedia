@@ -24,4 +24,14 @@ class Post extends Model
         }
         return url(Storage::url($value));
     }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
