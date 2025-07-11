@@ -1,8 +1,7 @@
-import { PostWithUser } from '@/pages/feed';
-import { User } from '@/types';
+import { PostWithUserLikeComment, User } from '@/types';
 import SinglePost from './SinglePost';
 interface Props {
-    posts: PostWithUser[];
+    posts: PostWithUserLikeComment[];
     currentUser: User;
 }
 

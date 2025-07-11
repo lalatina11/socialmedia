@@ -4,32 +4,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/co
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import FeedLayout from '@/layouts/FeedLayout';
-import { User } from '@/types';
+import { PostWithUser, PostWithUserLikeComment, User } from '@/types';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
 import { IoSend } from 'react-icons/io5';
 import { MdEmojiEmotions } from 'react-icons/md';
 import { RiImageAddFill } from 'react-icons/ri';
 import { toast } from 'sonner';
 
-export interface Post {
-    id: number;
-    user_id: number;
-    description: string;
-    image: string;
-}
-
-export interface PostWithUser extends Post {
-    user: User;
-}
-
 interface Props {
     auth: { user: User };
-    posts: PostWithUser[];
+    posts: PostWithUserLikeComment[];
     userId: number;
 }
 const Post = (props: Props) => {
-    console.log(props);
-
     const [formPost, setFormPost] = useState<{ description: string; image: File | null }>({ description: '', image: null });
     const [imagePreview, setImagePreview] = useState<string>('');
     const [posts, setPosts] = useState(props.posts);
@@ -54,13 +41,13 @@ const Post = (props: Props) => {
             if (!res.ok || result.error) {
                 throw new Error(result.message);
             }
-            console.log(result);
+            const newPost = result.data as PostWithUser;
 
             setFormPost({ description: '', image: null });
             if (imageRef.current?.value) {
                 imageRef.current.value = '';
             }
-            setPosts((prev) => [result.data as PostWithUser, ...prev]);
+            setPosts((prev) => [newPost as PostWithUserLikeComment, ...prev]);
             setFormPost({ description: '', image: null });
             if (imageRef.current) {
                 imageRef.current.value = '';

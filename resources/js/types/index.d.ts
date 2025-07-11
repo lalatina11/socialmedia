@@ -49,3 +49,36 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Post {
+    id: number;
+    user_id: number;
+    description: string;
+    image: string | null;
+}
+
+export interface Like {
+    id: string;
+    user_id: number;
+    post_id: number
+}
+
+export interface Comment {
+    id: number
+    description: string
+    user_id: number
+    post_id: number
+    user: User
+}
+
+export interface PostWithUser extends Post {
+    user: User;
+}
+
+export interface PostWithUserLike extends PostWithUser {
+    likes: Like[];
+}
+
+export interface PostWithUserLikeComment extends PostWithUserLike {
+    comments: Comment[]
+}
