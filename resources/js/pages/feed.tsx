@@ -17,6 +17,7 @@ interface Props {
     userId: number;
 }
 const Post = (props: Props) => {
+    console.log(props);
     const [formPost, setFormPost] = useState<{ description: string; image: File | null }>({ description: '', image: null });
     const [imagePreview, setImagePreview] = useState<string>('');
     const [posts, setPosts] = useState(props.posts);

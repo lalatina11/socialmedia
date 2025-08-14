@@ -15,5 +15,7 @@ Route::get('/posts', function () {
     dd(Auth::user());
 });
 
-Route::post('/auth/register', [AuthController::class, 'register'])->name('auth.register');
+Route::post('/v2/auth/register', [AuthController::class, 'register'])->name('auth.register');
+Route::post('/v2/auth/login', [AuthController::class, 'login'])->name('auth.login');
+Route::get('/v2/auth/current-user', [AuthController::class, 'getUserForClient'])->name('auth.get-user-for-client');
 // });
