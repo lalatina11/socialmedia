@@ -20,16 +20,27 @@ class AuthController extends Controller
         return config('app.jwt_secret');
     }
 
+    protected function guestGuard()
+    {
+        return !!(new AuthController())->getUserForServer();
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function showLogin(): \Inertia\Response
+    public function showLogin(): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
+        if ($this->guestGuard()) {
+            return redirect()->route('feed');
+        }
         return Inertia::render('auth/login');
     }
 
-    public function showRegister(): \Inertia\Response
+    public function showRegister(): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
+        if ($this->guestGuard()) {
+            return redirect()->route('feed');
+        }
         return Inertia::render('auth/register');
     }
 

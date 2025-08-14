@@ -18,7 +18,6 @@ interface Props {
     currentUser: User;
 }
 const Post = (props: Props) => {
-    console.log(props);
     const [formPost, setFormPost] = useState<{ description: string; image: File | null }>({ description: '', image: null });
     const [imagePreview, setImagePreview] = useState<string>('');
     const [posts, setPosts] = useState(props.posts);
@@ -68,10 +67,6 @@ const Post = (props: Props) => {
             setImagePreview(URL.createObjectURL(file));
         }
     };
-
-    useEffect(() => {
-        // document.documentElement.classList.remove('dark');
-    }, []);
 
     return (
         <FeedLayout>
