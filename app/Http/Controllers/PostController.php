@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\V2\AuthController;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -20,15 +21,18 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
-            $userId = $request->input('user_id');
             $request['description'] = $request->input('description');
             if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
                 if ($request->hasFile('image')) {
                     $path = $request->file('image')->store('posts', 'public');
                 }
             }
+            $user= (new AuthController())->getUserForServer();
+            if(!$user){
+                throw new \Exception('Not Authorized');
+            }
             $post = Post::create([
-                'user_id' => $userId,
+                'user_id' => $user->id,
                 'description' => $request['description'] ?? "",
                 'image' => $path ?? null,
             ]);

@@ -67,7 +67,7 @@ export default function Register() {
             }
             toast('Registration successful');
             form.reset();
-            router.get('/feed');
+            router.get(route('feed'));
         } catch (error) {
             console.log(error);
             const err = error as Error;

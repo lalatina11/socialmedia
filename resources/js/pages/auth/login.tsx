@@ -1,14 +1,14 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
-import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { toast } from 'sonner';
 
 type LoginForm = {
     email: string;
@@ -22,17 +22,32 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
-        email: '',
-        password: '',
-        remember: false,
-    });
-
-    const submit: FormEventHandler = (e) => {
+    const [formState, setFormState] = useState({ isLoading: false, error: { server: '', email: '', password: '' } });
+    const submit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        try {
+            const form = e.currentTarget;
+            const formData = new FormData(form);
+            const { email, password } = Object.fromEntries(formData.entries()) as unknown as LoginForm;
+            if (!email || !password) {
+                return;
+            }
+            setFormState({ isLoading: true, error: { server: '', email: '', password: '' } });
+            const res = await fetch(route('auth.login'), {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+            });
+            if (!res.ok) {
+                throw new Error('Something went wrong');
+            }
+            router.get(route('feed'));
+        } catch (error) {
+            console.log(error);
+            toast.error((error as Error).message);
+        } finally {
+            setFormState((prev) => ({ ...prev, isLoading: false }));
+        }
     };
 
     return (
@@ -46,15 +61,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Input
                             id="email"
                             type="email"
+                            name="email"
                             required
                             autoFocus
                             tabIndex={1}
                             autoComplete="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
                             placeholder="email@example.com"
                         />
-                        <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
@@ -69,29 +82,21 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Input
                             id="password"
                             type="password"
+                            name="password"
                             required
                             tabIndex={2}
                             autoComplete="current-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
-                        <InputError message={errors.password} />
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Checkbox
-                            id="remember"
-                            name="remember"
-                            checked={data.remember}
-                            onClick={() => setData('remember', !data.remember)}
-                            tabIndex={3}
-                        />
+                        <Checkbox id="remember" name="remember" tabIndex={3} />
                         <Label htmlFor="remember">Remember me</Label>
                     </div>
 
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={formState.isLoading}>
+                        {formState.isLoading && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log in
                     </Button>
                 </div>

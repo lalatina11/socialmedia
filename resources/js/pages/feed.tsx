@@ -15,6 +15,7 @@ interface Props {
     auth: { user: User };
     posts: PostWithUserLikeComment[];
     userId: number;
+    currentUser: User;
 }
 const Post = (props: Props) => {
     console.log(props);
@@ -32,7 +33,6 @@ const Post = (props: Props) => {
             if (formPost.image) {
                 formData.append('image', formPost.image);
             }
-            formData.append('user_id', props.auth.user.id.toString());
             const res = await fetch('/api/posts', {
                 method: 'POST',
                 credentials: 'include',
@@ -129,7 +129,7 @@ const Post = (props: Props) => {
                         </CardFooter>
                     </Card>
                 </section>
-                <Posts currentUser={props.auth.user} posts={posts} />
+                <Posts currentUser={props.currentUser} posts={posts} />
             </main>
         </FeedLayout>
     );
