@@ -15,6 +15,9 @@ Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('reg
 
 Route::get('/feed', function () {
     $currentUser = (new AuthController())->getUserForServer();
+    if(!$currentUser) {
+        return redirect()->route('login');
+    }
     $posts = (new PostController())->index();
     return Inertia::render('feed', [
         'posts' => $posts,
