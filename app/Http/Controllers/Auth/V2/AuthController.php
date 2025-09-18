@@ -118,7 +118,7 @@ class AuthController extends Controller
                 'error' => false,
                 'message' => 'success',
                 'user' => $user,]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response([
                 'error' => true,
                 'message' => $e->getMessage(),
